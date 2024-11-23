@@ -29,7 +29,7 @@ foreach ($site in $sites) {
     $batchSites+= [PSCustomObject]@{
         Url = $site.Url
     }
-    if($batchSites.Count -eq 90) {
+    if(($batchSites.Count -gt 90) -or ($site -eq $sites[-1])) {
         $batchSites_str = $batchSites_str.TrimEnd(",")
         # Write-Host $batchSites_str
         $addCMD = "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -AddSharePointLocationException $batchSites_str"
