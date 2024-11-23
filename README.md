@@ -6,5 +6,8 @@
 Remove-SPOSite -Identity  $url -Confirm:$false
 
 其次需要链接到exchange online，然后才能执行以下命令
-```shell
+```
+
+```
 Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -AddSharePointLocationException $batchSites_str
+```
