@@ -3,4 +3,3 @@ Connect-SPOService -Url https://lenovobeijing-admin.sharepoint.com
 # connect to Exchange Online compliance center
 Connect-IPPSSession -UserPrincipalName admin_lijy1@lenovo.com
 exit
-Get-RetentionCompliancePolicy -Identity "Lenovo retention" -DistributionDetail | Format-List

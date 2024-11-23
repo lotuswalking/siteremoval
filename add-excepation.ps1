@@ -5,6 +5,7 @@ $siteList = $siteList -join ","
 "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -AddSharePointLocationException $siteList" | Out-File -FilePath ".\ExceptionAdd.ps1"
 "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -RemoveSharePointLocationException  $siteList" | Out-File -FilePath ".\ExceptionRemove.ps1"
 # 执行例外添加脚本
+.\waitUntilDistribution.ps1
 .\ExceptionAdd.ps1
 .\waitUntilDistribution.ps1
 .\remove-site.ps1
