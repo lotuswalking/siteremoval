@@ -25,6 +25,7 @@ foreach ($site in $sites) {
         # Write-Host $batchSites_str
         $addCMD = "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -AddSharePointLocationException $batchSites_str"
         # execute an other powershell script
+        write-host "start to add exception ...."
         Invoke-Expression $addCMD
         # $addCMD
         Start-Sleep -Seconds 5
@@ -32,6 +33,7 @@ foreach ($site in $sites) {
         remove-sites -sites $batchSites
         .\waitUntilDistribution.ps1
         $delCMD = "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -RemoveSharePointLocationException $batchSites_str"
+        Write-Host "start to remove exception ...."
         Invoke-Expression $delCMD
         # $delCMD
         Start-Sleep -Seconds 5
