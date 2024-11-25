@@ -21,6 +21,33 @@ function waitPolicyDistribution {
     Write-Host "Distribution status is Success" -ForegroundColor Green
 }
 
+function Invoke-WithRetry {
+    param (
+        [string]$cmds,
+        [int]$maxRetries = 3,
+        [int]$retryDelay = 2
+    )
+
+    $retryCount = 0
+    $success = $false
+
+    while (-not $success -and $retryCount -lt $maxRetries) {
+        try {
+            Invoke-Expression $cmds
+            $success = $true
+        }
+        catch {
+            $retryCount++
+            Write-Host "Error occurred. Retrying... ($retryCount/$maxRetries)"
+            Start-Sleep -Seconds $retryDelay
+        }
+    }
+
+    if (-not $success) {
+        Write-Host "Operation failed after $maxRetries attempts."
+    }
+}
+
 $sites = Import-Csv -Path $csv_path
 $batchSites_str = ""
 $batchSites = [System.Collections.ArrayList]@()
@@ -35,7 +62,7 @@ foreach ($site in $sites) {
         $addCMD = "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -AddSharePointLocationException $batchSites_str"
         # execute an other powershell script
         write-host "start to add exception ...."
-        Invoke-Expression $addCMD
+        Invoke-WithRetry $addCMD
         # $addCMD
         Start-Sleep -Seconds 5
         waitPolicyDistribution
@@ -43,7 +70,9 @@ foreach ($site in $sites) {
         waitPolicyDistribution
         $delCMD = "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -RemoveSharePointLocationException $batchSites_str"
         Write-Host "start to remove exception ...."
-        Invoke-Expression $delCMD
+        
+
+        Invoke-WithRetry $delCMD
         # $delCMD
         Start-Sleep -Seconds 5
         waitPolicyDistribution
