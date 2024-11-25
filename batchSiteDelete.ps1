@@ -25,7 +25,7 @@ function Invoke-WithRetry {
     param (
         [string]$cmds,
         [int]$maxRetries = 3,
-        [int]$retryDelay = 2
+        [int]$retryDelay = 10
     )
 
     $retryCount = 0
