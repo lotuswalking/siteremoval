@@ -38,15 +38,15 @@ foreach ($site in $sites) {
         Invoke-Expression $addCMD
         # $addCMD
         Start-Sleep -Seconds 5
-        .\waitUntilDistribution.ps1
+        waitPolicyDistribution
         remove-sites -sites $batchSites
-        .\waitUntilDistribution.ps1
+        waitPolicyDistribution
         $delCMD = "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -RemoveSharePointLocationException $batchSites_str"
         Write-Host "start to remove exception ...."
         Invoke-Expression $delCMD
         # $delCMD
         Start-Sleep -Seconds 5
-        .\waitUntilDistribution.ps1
+        waitPolicyDistribution
         $batchSites_str = ""
         $batchSites = [System.Collections.ArrayList]@()
         # break
