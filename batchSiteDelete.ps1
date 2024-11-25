@@ -8,7 +8,7 @@ function remove-sites {
     foreach ($site in $sites) {
         $url = $site.Url
         Write-Host "Remove site: $url"
-        Remove-SPOSite -Identity  $url -Confirm:$false
+        Remove-SPOSite -Identity  $url -Confirm:$false -NoWait
     }
 }
 function waitPolicyDistribution {
@@ -51,18 +51,29 @@ function Invoke-WithRetry {
 $sites = Import-Csv -Path $csv_path
 $batchSites_str = ""
 $batchSites = [System.Collections.ArrayList]@()
+$startSiteUrl = "https://lenovobeijing-my.sharepoint.com/personal/humy5_lenovo_com"
+$startFlag = $false
 foreach ($site in $sites) {
+    if(($startFlag -eq $false) -and ($site.Url -eq $startSiteUrl)) {
+        Write-Host "Start from $startSiteUrl"
+        $startFlag = $true
+        continue
+    }
+    if($startFlag -eq $false) {
+        continue
+    }
     $batchSites_str += $site.Url + ","
     $batchSites+= [PSCustomObject]@{
         Url = $site.Url
     }
-    if(($batchSites.Count -gt 90) -or ($site -eq $sites[-1])) {
+    if(($batchSites.Count -gt 89) -or ($site -eq $sites[-1])) {
         $batchSites_str = $batchSites_str.TrimEnd(",")
+        Write-Host "Batch size: $($batchSites.Count)"
         # Write-Host $batchSites_str
         $addCMD = "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -AddSharePointLocationException $batchSites_str"
         # execute an other powershell script
         write-host "start to add exception ...."
-        Invoke-WithRetry $addCMD
+        Invoke-Expression $addCMD
         # $addCMD
         Start-Sleep -Seconds 5
         waitPolicyDistribution
@@ -70,8 +81,6 @@ foreach ($site in $sites) {
         waitPolicyDistribution
         $delCMD = "Set-RetentionCompliancePolicy -Identity `"Lenovo retention`" -RemoveSharePointLocationException $batchSites_str"
         Write-Host "start to remove exception ...."
-        
-
         Invoke-WithRetry $delCMD
         # $delCMD
         Start-Sleep -Seconds 5
